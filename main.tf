@@ -177,7 +177,7 @@ resource "aws_launch_template" "my_launch_template" {
               sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
               sudo apt-get update
               sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-              sudo docker run -d -p 5000:5000 --name flask ${{ secrets.DOCKER_U }}/flask:$GITHUB_RUN_NUMBER
+              sudo docker run -d -p 5000:5000 --name flask ${{ secrets.DOCKER_U }}/flask:${{ github_run_number }} 
               EOF
 
   block_device_mappings {

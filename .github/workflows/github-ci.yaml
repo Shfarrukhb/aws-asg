@@ -27,7 +27,7 @@ jobs:
         with:
           context: ./
           push: true
-          dockerfile: ./flask/Dockerfile
+          dockerfile: flask/Dockerfile
           tags: latest
 
   deploy-tf:

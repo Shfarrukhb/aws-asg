@@ -28,7 +28,7 @@ jobs:
           context: ./
           push: true
           dockerfile: ./flask/Dockerfile
-          tags: ${{ github_run_number }} 
+          tags: latest
 
   deploy-tf:
     runs-on: ubuntu-latest

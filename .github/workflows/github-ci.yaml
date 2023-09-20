@@ -4,9 +4,10 @@ on:
     branches:
       - main
 env:
-  dockerhub_u: ${{ secrets.dockerhub_u }}
-  dockerhub_p: ${{ secrets.dockerhub_p }}
-  aws_key: ${{ secrets.aws_key }}
+  DOCKERHUB_U: ${{ secrets.DOCKERHUB_U }}
+  DOCKERHUB_P: ${{ secrets.DOCKERHUB_P }}
+  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
 
 jobs:
   build:
@@ -19,37 +20,58 @@ jobs:
       - name: dockerhub login
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.dockerhub_u }}
-          password: ${{ secrets.dockerhub_p }}
+          username: ${{ secrets.DOCKERHUB_U }}
+          password: ${{ secrets.DOCKERHUB_P }}
       - name: Image build and push
         uses: docker/build-push-action@v2
         with:
           context: ./
           push: true
-          dockerfile: ./Dockerfile
-          tags: ${{ secrets.dockerhub_u }}/flask:$GITHUB_RUN_NUMBER
-  deploy:
-    needs: build
+          dockerfile: ./flask/Dockerfile
+          tags: ${{ secrets.DOCKERHUB_U }}/flask:$GITHUB_RUN_NUMBER
+  
+  deploy-tf:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout 
-      uses: actions/checkout@v2
-    - name: dockerhub login
-      uses: docker/login-action@v1
-      with:
-        username: ${{ env.dockerhub_u }}
-        password: ${{ env.dockerhub_p }}
-    - name: setting permissions for a key
-      run: |
-        echo "${{ env.aws_key }}" > key.pem
-        chmod 600 key.pem
-    - name: image pull
-      run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker pull ${{ secrets.dockerhub_u }}/flask:$GITHUB_RUN_NUMBER'
-    - name: Stop running container
-      run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker stop cddemo || true'
-        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker rm cddemo || true'
-    - name: Run new container
-      run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker run -d --name cddemo -p 80:3000 ${{ secrets.dockerhub_u }}/flask:$GITHUB_RUN_NUMBER'
+      - uses: actions/checkout@v2.5.0
+      - name: terrafrom install 
+        uses: hashicorp/setup-terraform@v2.0.2
+      - name: Configure AWS Credentials Action For GitHub Actions
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Checking exsistance of tf files
+        run: ls -la 
+      - name: terraform apply
+        run: |
+          terraform init
+          terraform plan
+          terraform apply --auto-approve
+
+
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: checkout 
+  #     uses: actions/checkout@v2
+  #   - name: dockerhub login
+  #     uses: docker/login-action@v1
+  #     with:
+  #       username: ${{ env.DOCKERHUB_U }}
+  #       password: ${{ env.DOCKERHUB_P }}
+  #   - name: setting permissions for a key
+  #     run: |
+  #       echo "${{ env.AWS_PRIVATE_KEY }}" > key.pem
+  #       chmod 600 key.pem
+  #   - name: image pull
+  #     run: |
+  #       ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker pull ${{ secrets.DOCKERHUB_U }}/flask:$GITHUB_RUN_NUMBER'
+  #   - name: Stop running container
+  #     run: |
+  #       ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker stop cddemo || true'
+  #       ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker rm cddemo || true'
+  #   - name: Run new container
+  #     run: |
+  #       ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker run -d --name cddemo -p 80:3000 ${{ secrets.DOCKERHUB_U }}/flask:$GITHUB_RUN_NUMBER'

@@ -1,2 +1,4 @@
 .venv
 web.pem
+.terraform
+Terraform

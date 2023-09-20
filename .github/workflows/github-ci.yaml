@@ -4,9 +4,9 @@ on:
     branches:
       - main
 env:
-  dockerhub_u: ${{ secrets.DOCKERHUB_USERNAME }}
-  dockerhub_p: ${{ secrets.DOCKERHUB_TOKEN }}
-  aws_key: ${{ secrets.AWS_PRIVATE_KEY }}
+  dockerhub_u: ${{ secrets.dockerhub_u }}
+  dockerhub_p: ${{ secrets.dockerhub_p }}
+  aws_key: ${{ secrets.aws_key }}
 
 jobs:
   build:
@@ -37,8 +37,8 @@ jobs:
     - name: dockerhub login
       uses: docker/login-action@v1
       with:
-        username: ${{ env.DOCKERHUB_USERNAME }}
-        password: ${{ env.DOCKERHUB_TOKEN }}
+        username: ${{ env.dockerhub_u }}
+        password: ${{ env.dockerhub_p }}
     - name: setting permissions for a key
       run: |
         echo "${{ env.aws_key }}" > key.pem

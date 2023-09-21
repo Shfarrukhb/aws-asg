@@ -15,20 +15,14 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: image build
-        uses: docker/setup-buildx-action@v1
       - name: dockerhub login
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_U }}
           password: ${{ secrets.DOCKERHUB_P }}
       - name: Image build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: ./flask
-          push: true
-          dockerfile: Dockerfile
-          tags: latest
+        run: docker build -t ${{ secrets.DOCKERHUB_U }}/flask:${{ github.run.number }} -f flask/Dockerfile
+        
 
   deploy-tf:
     runs-on: ubuntu-latest

@@ -28,6 +28,7 @@ jobs:
           push: true
           dockerfile: Dockerfile
           tags: ${{ env.DOCKERHUB_U }}/flask:latest
+          
 
   deploy-tf:
     runs-on: ubuntu-latest

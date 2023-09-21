@@ -7,7 +7,7 @@ env:
   DOCKERHUB_U: ${{ secrets.DOCKERHUB_U }}
   DOCKERHUB_P: ${{ secrets.DOCKERHUB_P }}
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
   REGISTRY: ${{ secrets.DOCKERHUB_U }}
   IMAGE_NAME: flask
   AWS_REGION: us-east-1

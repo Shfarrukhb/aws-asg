@@ -21,18 +21,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_U }}
           password: ${{ secrets.DOCKERHUB_P }}
-      # - name: Extract metadata (tags, labels) for Docker
-      #   id: meta
-      #   uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-      #   with:
-      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       - name: Image build and push
         uses: docker/build-push-action@v2
         with:
           context: ./flask
           push: true
           dockerfile: Dockerfile
-          tags: shfarrukhb/flask:latest
+          tags: ${{ env.DOCKERHUB_U }}/flask:latest
 
   deploy-tf:
     runs-on: ubuntu-latest

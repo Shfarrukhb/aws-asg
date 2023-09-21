@@ -10,6 +10,7 @@ env:
   AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
   REGISTRY: ${{ secrets.DOCKERHUB_U }}
   IMAGE_NAME: flask
+  AWS_REGION: us-east-1
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,7 +29,7 @@ jobs:
           push: true
           dockerfile: Dockerfile
           tags: ${{ env.DOCKERHUB_U }}/flask:latest
-          
+
 
   deploy-tf:
     runs-on: ubuntu-latest
@@ -41,6 +42,8 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Checking exsistance of tf files
         run: ls -la 
       - name: terraform apply

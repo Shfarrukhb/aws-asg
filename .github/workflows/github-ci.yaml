@@ -51,30 +51,3 @@ jobs:
           terraform init
           terraform plan
           terraform apply --auto-approve
-
-
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: checkout 
-  #     uses: actions/checkout@v2
-  #   - name: dockerhub login
-  #     uses: docker/login-action@v1
-  #     with:
-  #       username: ${{ env.DOCKERHUB_U }}
-  #       password: ${{ env.DOCKERHUB_P }}
-  #   - name: setting permissions for a key
-  #     run: |
-  #       echo "${{ env.AWS_PRIVATE_KEY }}" > key.pem
-  #       chmod 600 key.pem
-  #   - name: image pull
-  #     run: |
-  #       ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker pull ${{ secrets.DOCKERHUB_U }}/flask:$GITHUB_RUN_NUMBER'
-  #   - name: Stop running container
-  #     run: |
-  #       ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker stop cddemo || true'
-  #       ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker rm cddemo || true'
-  #   - name: Run new container
-  #     run: |
-  #       ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@your-ec2-instance-ip 'sudo docker run -d --name cddemo -p 80:3000 ${{ secrets.DOCKERHUB_U }}/flask:$GITHUB_RUN_NUMBER'

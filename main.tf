@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "4.49.0"
     }
   }
@@ -9,14 +9,14 @@ terraform {
 
 provider "aws" {
   region     = "us-east-1"
-  access_key = "my-access-key"
-  secret_key = "my-secret-key"
+  access_key = "AKIAWBHOXTD32KKBQV3D"
+  secret_key = "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"
 }
 
 #VPC
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
-  
+
   tags = {
     Name = "my-app-vpc"
   }
@@ -24,8 +24,8 @@ resource "aws_vpc" "main" {
 
 #Subnets
 resource "aws_subnet" "public_a" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a"
 
   tags = {
@@ -34,8 +34,8 @@ resource "aws_subnet" "public_a" {
 }
 
 resource "aws_subnet" "public_b" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"
   availability_zone = "us-east-1b"
 
   tags = {
@@ -44,8 +44,8 @@ resource "aws_subnet" "public_b" {
 }
 
 resource "aws_subnet" "public_c" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.3.0/24"
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.3.0/24"
   availability_zone = "us-east-1c"
 
   tags = {
@@ -94,31 +94,31 @@ resource "aws_route_table_association" "c" {
 
 #SG
 resource "aws_security_group" "my_sg" {
-  name        = "my-sg"
-  vpc_id      = aws_vpc.main.id
+  name   = "my-sg"
+  vpc_id = aws_vpc.main.id
 
   ingress {
-    description      = "Allow http from everywhere"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "Allow http from everywhere"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description      = "Allow http from everywhere"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "Allow http from everywhere"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    description      = "Allow outgoing traffic"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "Allow outgoing traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -149,36 +149,21 @@ resource "aws_lb_listener" "my_lb_listener" {
 
 #TargetGroup
 resource "aws_lb_target_group" "my_tg" {
-  name     = "my-tg"
+  name        = "my-tg"
   target_type = "instance"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
 }
 
 #LaunchTemplate
 resource "aws_launch_template" "my_launch_template" {
 
-  name = "my_launch_template"
-  
-  image_id = "ami-0b0d560d43e65a601"
+  name          = "my_launch_template"
+  image_id      = "ami-053b0d53c279acc90"
   instance_type = "t3.micro"
-  key_name = "web"
-  user_data = <<-EOF
-              #!/bin/bash
-              apt update
-              sudo apt-get update
-              sudo apt-get install ca-certificates curl gnupg
-              sudo install -m 0755 -d /etc/apt/keyrings
-              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-              echo \
-              "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-              "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-              sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-              sudo apt-get update
-              sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-              sudo docker run -d -p 5000:5000 --name flask shfarrukhb/flask:latest 
-              EOF
+  key_name      = "web"
+  user_data     = filebase64("user-data.sh")
 
   block_device_mappings {
     device_name = "/dev/sda1"
@@ -188,10 +173,10 @@ resource "aws_launch_template" "my_launch_template" {
       volume_type = "gp2"
     }
   }
-  
+
   network_interfaces {
     associate_public_ip_address = true
-    security_groups = [aws_security_group.my_sg.id]
+    security_groups             = [aws_security_group.my_sg.id]
   }
   lifecycle {
     create_before_destroy = true
@@ -200,15 +185,15 @@ resource "aws_launch_template" "my_launch_template" {
 
 #ASG
 resource "aws_autoscaling_group" "my_asg" {
-  name                      = "my_asg"
-  max_size                  = 5
-  min_size                  = 2
-  health_check_type         = "ELB"
-  desired_capacity          = 2
+  name              = "my_asg"
+  max_size          = 5
+  min_size          = 2
+  health_check_type = "ELB"
+  desired_capacity  = 2
   target_group_arns = [aws_lb_target_group.my_tg.arn]
 
-  vpc_zone_identifier       = [aws_subnet.public_a.id, aws_subnet.public_b.id, aws_subnet.public_c.id]
-  
+  vpc_zone_identifier = [aws_subnet.public_a.id, aws_subnet.public_b.id, aws_subnet.public_c.id]
+
   launch_template {
     id      = aws_launch_template.my_launch_template.id
     version = "$Latest"
@@ -221,8 +206,8 @@ resource "aws_autoscaling_policy" "scale_up" {
   policy_type            = "SimpleScaling"
   autoscaling_group_name = aws_autoscaling_group.my_asg.name
   adjustment_type        = "ChangeInCapacity"
-  scaling_adjustment     = "1"    # add one instance
-  cooldown               = "300"  # cooldown period after scaling
+  scaling_adjustment     = "1"   # add one instance
+  cooldown               = "300" # cooldown period after scaling
 }
 
 resource "aws_cloudwatch_metric_alarm" "scale_up_alarm" {

@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+
 env:
   DOCKERHUB_U: ${{ secrets.DOCKERHUB_U }}
   DOCKERHUB_P: ${{ secrets.DOCKERHUB_P }}
@@ -10,17 +11,22 @@ env:
   AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
   AWS_REGION: us-east-1
   TAG: ${{ github.run_number }}
+  db_table_name: shfarrukhb-challenge-dynamodb
+  s3_name: shfarrukhb-challenge-state
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v2
+      
       - name: dockerhub login
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_U }}
           password: ${{ secrets.DOCKERHUB_P }}
+      
       - name: Image build and push
         uses: docker/build-push-action@v2
         with:
@@ -29,24 +35,55 @@ jobs:
           dockerfile: Dockerfile
           tags: ${{ env.DOCKERHUB_U }}/flask:${{ env.TAG }}
 
+  deploy-tf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.5.0
+      
+      - name: Configure AWS Credentials Action For GitHub Actions
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+            
+      - name: terrafrom install 
+        uses: hashicorp/setup-terraform@v2.0.2
+      
+      - name: Checking exsistance of tf files
+        run: ls -la 
+      
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+            python-version: '3.10' # install the python version needed
 
-  # deploy-tf:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2.5.0
-  #     - name: terrafrom install 
-  #       uses: hashicorp/setup-terraform@v2.0.2
-  #     - name: Configure AWS Credentials Action For GitHub Actions
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ${{ env.AWS_REGION }}
+      - name: DB check 
+        id: check-db
+        run: |
+            python -m pip install --upgrade pip
+            pip install boto3
+            python ./python/db_check.py
+      
+      - name: DB create  /python script
+        run: |
+            python ./python/db_create.py
+        if: steps.check-db.outputs.db_chr == 'None'
 
-  #     - name: Checking exsistance of tf files
-  #       run: ls -la 
-  #     - name: terraform apply
-  #       run: |
-  #         terraform init
-  #         terraform plan
-  #         terraform apply --auto-approve
+      - name: S3 check 
+        id: check-s3
+        run: |
+            python -m pip install --upgrade pip
+            python ./python/s3_check.py
+      
+      - name: S3 create aws cli
+        run: |
+          aws s3api create-bucket --bucket ${{ env.s3_name }} --region ${{ env.region }}
+          echo "Bucket ${{ env.s3_name}} has been created"
+        if: steps.check-s3.outputs.s3_chr == 'None'
+
+      - name: terraform apply
+        run: |
+            terraform init
+            terraform plan
+            terraform apply --auto-approve -var tag=${{ env.TAG }}

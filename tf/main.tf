@@ -28,9 +28,6 @@ resource "aws_vpc" "main" {
   tags = {
     Name = "my-app-vpc"
   }
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
 }
 
 #Subnets
@@ -42,9 +39,6 @@ resource "aws_subnet" "public_a" {
   tags = {
     Name = "public_a"
   }
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
 }
 
 resource "aws_subnet" "public_b" {
@@ -55,9 +49,6 @@ resource "aws_subnet" "public_b" {
   tags = {
     Name = "public_b"
   }
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
 }
 
 resource "aws_subnet" "public_c" {
@@ -68,10 +59,6 @@ resource "aws_subnet" "public_c" {
   tags = {
     Name = "public_c"
   }
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
-
 }
 
 #igw
@@ -81,9 +68,6 @@ resource "aws_internet_gateway" "main-igw" {
   tags = {
     Name = "main-igw"
   }
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
 }
 
 #rt
@@ -98,34 +82,22 @@ resource "aws_route_table" "public_rt" {
   tags = {
     Name = "public_rt"
   }
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
 }
 
 #rta
 resource "aws_route_table_association" "a" {
   subnet_id      = aws_subnet.public_a.id
   route_table_id = aws_route_table.public_rt.id
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
 }
 
 resource "aws_route_table_association" "b" {
   subnet_id      = aws_subnet.public_b.id
   route_table_id = aws_route_table.public_rt.id
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
 }
 
 resource "aws_route_table_association" "c" {
   subnet_id      = aws_subnet.public_c.id
   route_table_id = aws_route_table.public_rt.id
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
 }
 
 #SG
@@ -152,9 +124,6 @@ resource "aws_security_group" "my_sg" {
   tags = {
     Name = "my-sg"
   }
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
 }
 
 #LoadBalancer
@@ -164,9 +133,6 @@ resource "aws_lb" "my_alb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.my_sg.id]
   subnets            = [aws_subnet.public_a.id, aws_subnet.public_b.id, aws_subnet.public_c.id]
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 #Listener
@@ -179,9 +145,6 @@ resource "aws_lb_listener" "my_lb_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.my_tg.arn
   }
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 #TargetGroup
@@ -191,10 +154,6 @@ resource "aws_lb_target_group" "my_tg" {
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
-  lifecycle {
-    create_before_destroy = true
-  }
-
 }
 
 #LaunchTemplate
@@ -242,9 +201,6 @@ resource "aws_autoscaling_group" "my_asg" {
     id      = aws_launch_template.my_launch_template.id
     version = "$Latest"
   }
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 #ASG Policy Up
@@ -255,9 +211,6 @@ resource "aws_autoscaling_policy" "scale_up" {
   adjustment_type        = "ChangeInCapacity"
   scaling_adjustment     = "1"   # add one instance
   cooldown               = "180" # cooldown period after scaling
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "scale_up_alarm" {
@@ -275,9 +228,6 @@ resource "aws_cloudwatch_metric_alarm" "scale_up_alarm" {
   }
   actions_enabled = true
   alarm_actions   = [aws_autoscaling_policy.scale_up.arn]
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 #ASG Policy Down
@@ -288,9 +238,6 @@ resource "aws_autoscaling_policy" "scale_down" {
   scaling_adjustment     = "-1"
   cooldown               = "180"
   policy_type            = "SimpleScaling"
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "scale_down_alarm" {
@@ -308,7 +255,4 @@ resource "aws_cloudwatch_metric_alarm" "scale_down_alarm" {
   }
   actions_enabled = true
   alarm_actions   = [aws_autoscaling_policy.scale_down.arn]
-  lifecycle {
-    create_before_destroy = true
-  }
 }

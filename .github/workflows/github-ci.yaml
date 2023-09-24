@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-
+ 
 env:
   DOCKERHUB_U: ${{ secrets.DOCKERHUB_U }}
   DOCKERHUB_P: ${{ secrets.DOCKERHUB_P }}
@@ -84,6 +84,7 @@ jobs:
 
       - name: terraform apply
         run: |
+            cd tf
             terraform init
             terraform plan
             terraform apply --auto-approve -var tag=${{ env.TAG }}

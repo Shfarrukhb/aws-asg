@@ -28,4 +28,26 @@ jobs:
           context: ./flask
           push: true
           dockerfile: Dockerfile
-          tags: ${{ env.DOCKERHUB_U }}/flask:${{ github.run.number }}
+          tags: ${{ env.DOCKERHUB_U }}/flask:latest
+
+
+  deploy-tf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.5.0
+      - name: terrafrom install 
+        uses: hashicorp/setup-terraform@v2.0.2
+      - name: Configure AWS Credentials Action For GitHub Actions
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Checking exsistance of tf files
+        run: ls -la 
+      - name: terraform apply
+        run: |
+          terraform init
+          terraform plan
+          terraform apply --auto-approve

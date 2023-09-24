@@ -28,7 +28,7 @@ jobs:
           context: ./flask
           push: true
           dockerfile: Dockerfile
-          tags: ${{ env.REPOSITORY }}:${{ env.TAG }}
+          tags: ${{ env.TAG }}
 
 
   # deploy-tf:

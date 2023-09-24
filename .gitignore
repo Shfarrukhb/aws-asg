@@ -1,9 +1,5 @@
 .venv
 web.pem
-.terraform
 Terraform
-terraform.tfstate
-terraform.tfstate.backup
-.terraform.lock.hcl
-Tfpart
-main.tf
+tf/.terraform
+tf/.terraform.lock.hcl

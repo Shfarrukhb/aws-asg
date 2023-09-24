@@ -31,7 +31,7 @@ jobs:
           context: ./flask
           push: true
           dockerfile: Dockerfile
-          tags: ${{ secrets.DOCKERHUB_U }}/flask:${{ env.tag }}
+          tags: ${{ secrets.DOCKERHUB_U }}/flask:latest
 
   deploy-tf:
     runs-on: ubuntu-latest
@@ -85,5 +85,5 @@ jobs:
             cd tf
             ls -la
             terraform init
-            terraform plan -var tag=${{ env.tag }} -lock=false
-            terraform apply --auto-approve -var tag=${{ env.tag }} -lock=false
+            terraform plan -lock=false
+            terraform apply --auto-approve -lock=false

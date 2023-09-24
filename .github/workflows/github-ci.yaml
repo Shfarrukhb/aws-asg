@@ -5,8 +5,8 @@ on:
       - main
  
 env:
-  # dockerhub_u: ${{ secrets.DOCKERHUB_U }}
-  # dockerhub_p: ${{ secrets.DOCKERHUB_P }}
+  aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+  aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
   region: us-east-1
   tag: ${{ github.run_number }}
   db_table_name: shfarrukhb-challenge-dynamodb
@@ -15,7 +15,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
+    steps:  
       - name: checkout
         uses: actions/checkout@v2
       
@@ -36,6 +36,25 @@ jobs:
   deploy-tf:
     runs-on: ubuntu-latest
     steps:
+      - name: Clear cache
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log("About to clear")
+            const caches = await github.rest.actions.getActionsCacheList({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+            for (const cache of caches.data.actions_caches) {
+              console.log(cache)
+              github.rest.actions.deleteActionsCacheById({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                cache_id: cache.id,
+              })
+            }
+            console.log("Clear completed")
+            
       - uses: actions/checkout@v2.5.0
       
       - name: Configure AWS Credentials Action For GitHub Actions

@@ -54,7 +54,7 @@ jobs:
               })
             }
             console.log("Clear completed")
-            
+
       - uses: actions/checkout@v2.5.0
       
       - name: Configure AWS Credentials Action For GitHub Actions
@@ -104,9 +104,7 @@ jobs:
             cd tf
             ls -la
             terraform init
-            terraform plan -lock=false
+            terraform plan -lock=false -var tag=latest
             
       - name: terraform apply
-        run: |
-            cd tf
-            terraform apply --auto-approve -lock=false
+        run: terraform apply --auto-approve -lock=false -var tag=latest

@@ -200,7 +200,7 @@ resource "aws_lb_target_group" "my_tg" {
 #LaunchTemplate
 resource "aws_launch_template" "my_launch_template" {
 
-  name          = "my_launch_template"
+  name_prefix          = "my_launch_template-"
   image_id      = "ami-053b0d53c279acc90"
   instance_type = "t2.micro"
   key_name      = "web"
@@ -229,7 +229,7 @@ resource "aws_launch_template" "my_launch_template" {
 
 #ASG
 resource "aws_autoscaling_group" "my_asg" {
-  name_prefix = "my_asg-${aws_launch_template.my_launch_template.latest_version}-"
+  name = "${aws_launch_configuration.my_launch_template.name}-asg"
   max_size          = 5
   min_size          = 2
   health_check_type = "ELB"
@@ -254,7 +254,7 @@ resource "aws_autoscaling_policy" "scale_up" {
   autoscaling_group_name = aws_autoscaling_group.my_asg.name
   adjustment_type        = "ChangeInCapacity"
   scaling_adjustment     = "1"   # add one instance
-  cooldown               = "300" # cooldown period after scaling
+  cooldown               = "180" # cooldown period after scaling
   lifecycle {
     create_before_destroy = true
   }
@@ -269,7 +269,7 @@ resource "aws_cloudwatch_metric_alarm" "scale_up_alarm" {
   namespace           = "AWS/EC2"
   period              = "60"
   statistic           = "Average"
-  threshold           = "60"
+  threshold           = "50"
   dimensions = {
     "AutoScalingGroupName" = aws_autoscaling_group.my_asg.name
   }
@@ -286,7 +286,7 @@ resource "aws_autoscaling_policy" "scale_down" {
   autoscaling_group_name = aws_autoscaling_group.my_asg.name
   adjustment_type        = "ChangeInCapacity"
   scaling_adjustment     = "-1"
-  cooldown               = "300"
+  cooldown               = "180"
   policy_type            = "SimpleScaling"
   lifecycle {
     create_before_destroy = true

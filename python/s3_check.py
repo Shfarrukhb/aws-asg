@@ -2,7 +2,7 @@ import boto3
 import time 
 import os 
  
-region = os.getenv('AWS_REGION')
+region = os.getenv('region')
 bucket_name = os.getenv('s3_name')
 s3_list = [] 
  

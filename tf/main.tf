@@ -205,10 +205,9 @@ resource "aws_launch_template" "my_launch_template" {
   instance_type = "t2.micro"
   key_name      = "web"
   user_data = (base64encode(templatefile("user-data.tpl",
-  #   {
-  #     ci_run_number = var.tag
-  # }
-   )))
+    {
+      ci_run_number = var.tag
+  })))
 
   block_device_mappings {
     device_name = "/dev/sda1"

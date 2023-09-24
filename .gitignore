@@ -3,4 +3,3 @@ web.pem
 Terraform
 tf/.terraform
 tf/.terraform.lock.hcl
-tf/variables.tf

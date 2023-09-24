@@ -200,7 +200,7 @@ resource "aws_lb_target_group" "my_tg" {
 #LaunchTemplate
 resource "aws_launch_template" "my_launch_template" {
 
-  name_prefix          = "my_launch_template-"
+  name          = "my_launch_template"
   image_id      = "ami-053b0d53c279acc90"
   instance_type = "t2.micro"
   key_name      = "web"
@@ -229,7 +229,7 @@ resource "aws_launch_template" "my_launch_template" {
 
 #ASG
 resource "aws_autoscaling_group" "my_asg" {
-  name = "${aws_launch_template.my_launch_template.name}-asg"
+  name = "my_asg"
   max_size          = 5
   min_size          = 2
   health_check_type = "ELB"

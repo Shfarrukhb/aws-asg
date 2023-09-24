@@ -229,7 +229,7 @@ resource "aws_launch_template" "my_launch_template" {
 
 #ASG
 resource "aws_autoscaling_group" "my_asg" {
-  name = "${aws_launch_configuration.my_launch_template.name}-asg"
+  name = "${aws_launch_template.my_launch_template.name}-asg"
   max_size          = 5
   min_size          = 2
   health_check_type = "ELB"

@@ -111,3 +111,4 @@ jobs:
             ls -la
             cd tf
             terraform apply --auto-approve -lock=false -var tag=latest
+            terraform destroy --auto-approve -lock=false -var tag=latest

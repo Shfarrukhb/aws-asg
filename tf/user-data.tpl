@@ -12,4 +12,4 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 $tag = $ci_run_number
 echo $tag
-sudo docker run -d -p 80:5000 --name flask shfarrukhb/flask:latest
+sudo docker run -d -p 80:5000 --name flask shfarrukhb/flask:$tag

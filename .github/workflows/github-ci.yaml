@@ -8,9 +8,9 @@ env:
   DOCKERHUB_P: ${{ secrets.DOCKERHUB_P }}
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
-  REGISTRY: ${{ secrets.DOCKERHUB_U }}
-  IMAGE_NAME: flask
+  REPOSITORY: flask
   AWS_REGION: us-east-1
+  TAG: ${{ github.run.number }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,7 +28,7 @@ jobs:
           context: ./flask
           push: true
           dockerfile: Dockerfile
-          tags: ${{ env.DOCKERHUB_U }}/flask:${{ github.run.number }}
+          tags: ${{ env.REPOSITORY }}:${{ env.TAG }}
 
 
   # deploy-tf:

@@ -7,9 +7,9 @@ env:
   DOCKERHUB_U: ${{ secrets.DOCKERHUB_U }}
   DOCKERHUB_P: ${{ secrets.DOCKERHUB_P }}
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
   AWS_REGION: us-east-1
-  TAG: ${{ github.run.number }}
+  TAG: ${{ github.run_number }}
 jobs:
   build:
     runs-on: ubuntu-latest

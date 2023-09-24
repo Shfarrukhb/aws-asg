@@ -107,4 +107,7 @@ jobs:
             terraform plan -lock=false -var tag=latest
             
       - name: terraform apply
-        run: terraform apply --auto-approve -lock=false -var tag=latest
+        run: |
+            ls -la
+            cd tf
+            terraform apply --auto-approve -lock=false -var tag=latest

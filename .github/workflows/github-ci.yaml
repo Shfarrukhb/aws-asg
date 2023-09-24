@@ -80,10 +80,14 @@ jobs:
           echo "Bucket ${{ env.s3_name}} has been created"
         if: steps.check-s3.outputs.s3_chr == 'None'
 
-      - name: terraform apply
+      - name: terraform init & plan 
         run: |
             cd tf
             ls -la
             terraform init
             terraform plan -lock=false
+            
+      - name: terraform apply
+        run: |
+            cd tf
             terraform apply --auto-approve -lock=false

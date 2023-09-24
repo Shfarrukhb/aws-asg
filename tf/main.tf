@@ -201,6 +201,24 @@ resource "aws_autoscaling_group" "my_asg" {
     id      = aws_launch_template.my_launch_template.id
     version = "$Latest"
   }
+  # Instance Refresh
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      #instance_warmup = 300 # Default behavior is to use the Auto Scaling Group's health check grace period.
+      min_healthy_percentage = 50
+    }
+    triggers = [ /*"launch_template",*/ "desired_capacity" ]
+  }
+
+  tag {
+    key                 = "Owners"
+    value               = "Web-Team"
+    propagate_at_launch = true
+  }
+  lifecycle {
+    create_before_destroy = true
+  }      
 }
 
 #ASG Policy Up
